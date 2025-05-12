@@ -1,0 +1,53 @@
+#:kivy 2.3.0
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDRectangleFlatButton kivymd.uix.button.MDRectangleFlatButton
+
+<LoginScreen>:
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: "32dp"
+        spacing: "24dp"
+
+        MDLabel:
+            text: "Iniciar sesión"
+            font_style: "H4"
+            halign: "center"
+
+        MDTextField:
+            id: username_input
+            hint_text: "Usuario"
+            mode: "rectangle"
+
+        MDTextField:
+            id: password_input
+            hint_text: "Contraseña"
+            password: True
+            mode: "rectangle"
+
+        MDLabel:
+            id: login_error
+            text: root.error_msg if hasattr(root, 'error_msg') else ""
+            font_style: "Caption"
+            halign: "center"
+            theme_text_color: "Error"
+
+        MDBoxLayout:
+            orientation: "horizontal"
+            spacing: "8dp"
+            size_hint_y: None
+            height: "48dp"
+
+            MDRectangleFlatButton:
+                text: "Volver"
+                on_release: app.root.current = "home"
+
+            MDRectangleFlatButton:
+                text: "Registrarse"
+                on_release: root.register(username_input.text, password_input.text)
+
+        MDRectangleFlatButton:
+            text: "Ingresar"
+            on_release: root.login(username_input.text, password_input.text)
+            pos_hint: {"center_x": 0.5}

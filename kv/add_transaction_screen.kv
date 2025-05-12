@@ -1,0 +1,62 @@
+#:kivy 2.3.0
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDRectangleFlatButton kivymd.uix.button.MDRectangleFlatButton
+
+<AddTransactionScreen>:
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: "16dp"
+        spacing: "16dp"
+
+        MDLabel:
+            text: "Nueva transacción"
+            font_style: "H5"
+            halign: "center"
+
+        MDTextField:
+            id: monto_in
+            hint_text: "Monto (ej. 15000)"
+            input_filter: "float"
+            mode: "rectangle"
+
+        MDTextField:
+            id: cat_in
+            hint_text: "Categoría (ej. Comida)"
+            mode: "rectangle"
+
+        Spinner:
+            id: tipo_sp
+            text: "ingreso"
+            values: ["ingreso", "egreso"]
+
+        MDTextField:
+            id: fecha_in
+            hint_text: "Fecha (YYYY-MM-DD, opcional)"
+            mode: "rectangle"
+
+        MDTextField:
+            id: nota_in
+            hint_text: "Nota (opcional)"
+            mode: "rectangle"
+
+        MDLabel:
+            id: err_lbl
+            text: root.error_msg
+            font_style: "Caption"
+            halign: "center"
+            theme_text_color: "Error"
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: "48dp"
+            spacing: "8dp"
+
+            MDRectangleFlatButton:
+                text: "Guardar"
+                on_release: root.save_tx(monto_in.text, cat_in.text, tipo_sp.text, fecha_in.text, nota_in.text)
+
+            MDRectangleFlatButton:
+                text: "Cancelar"
+                on_release: app.root.current = "home"

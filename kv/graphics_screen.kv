@@ -1,0 +1,43 @@
+#:kivy 2.3.0
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDRectangleFlatButton kivymd.uix.button.MDRectangleFlatButton
+
+<GraphicsScreen>:
+    canvas.before:
+        Color:
+            rgba: (0.12, 0.12, 0.12, 1) if app.theme_cls.theme_style == "Dark" else (1, 1, 1, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: "16dp"
+        spacing: "16dp"
+
+        MDLabel:
+            text: "Gráficos"
+            font_style: "H5"
+            halign: "center"
+
+        MDBoxLayout:
+            size_hint_y: None
+            height: "48dp"
+            spacing: "8dp"
+
+            MDRectangleFlatButton:
+                text: "Torta por categoría"
+                on_release: root.show_pie_chart()
+
+            MDRectangleFlatButton:
+                text: "Comparar meses"
+                on_release: root.show_bar_chart()
+
+        MDBoxLayout:
+            id: chart_box
+            size_hint_y: 0.8
+
+        MDRectangleFlatButton:
+            text: "Volver"
+            on_release: app.root.current = "home"

@@ -1,0 +1,106 @@
+#:kivy 2.3.0
+#:import MDBoxLayout kivymd.uix.boxlayout.MDBoxLayout
+#:import MDLabel kivymd.uix.label.MDLabel
+#:import MDTextField kivymd.uix.textfield.MDTextField
+#:import MDRectangleFlatButton kivymd.uix.button.MDRectangleFlatButton
+
+<HomeScreen>:
+    ScrollView:
+        MDBoxLayout:
+            orientation: "vertical"
+            padding: "16dp"
+            spacing: "16dp"
+            size_hint_y: None
+            height: self.minimum_height
+
+            MDLabel:
+                text: "Mis transacciones"
+                font_style: "H5"
+                halign: "center"
+                theme_text_color: "Primary"
+
+            MDLabel:
+                id: balance_lbl
+                text: "Balance mensual: $0"
+                font_style: "Subtitle1"
+                halign: "center"
+                theme_text_color: "Secondary"
+
+            MDBoxLayout:
+                size_hint_y: None
+                height: "48dp"
+                spacing: "8dp"
+
+                Spinner:
+                    id: filtro_categoria
+                    text: "Todas"
+                    values: ["Todas"]
+                    on_text: root.filtrar()
+                    background_color: (0.2, 0.2, 0.2, 1) if app.theme_cls.theme_style == "Dark" else (1, 1, 1, 1)
+                    color: (1, 1, 1, 1) if app.theme_cls.theme_style == "Dark" else (0, 0, 0, 1)
+
+                Spinner:
+                    id: filtro_mes
+                    text: "Todos"
+                    values: ["Todos"]
+                    on_text: root.filtrar()
+                    background_color: (0.2, 0.2, 0.2, 1) if app.theme_cls.theme_style == "Dark" else (1, 1, 1, 1)
+                    color: (1, 1, 1, 1) if app.theme_cls.theme_style == "Dark" else (0, 0, 0, 1)
+
+                MDRectangleFlatButton:
+                    text: "Limpiar"
+                    on_release: root.limpiar_filtros()
+
+            MDLabel:
+                text: "Transacciones"
+                font_style: "Subtitle1"
+                halign: "center"
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "28dp"
+
+            MDList:
+                id: transacciones_list
+
+            MDLabel:
+                text: "Presupuestos activos"
+                font_style: "Subtitle1"
+                halign: "center"
+                theme_text_color: "Secondary"
+                size_hint_y: None
+                height: "28dp"
+
+            MDList:
+                id: presupuestos_list
+
+            MDRectangleFlatButton:
+                text: "+ Nueva transacción"
+                on_release: app.root.current = "add_tx"
+
+            MDRectangleFlatButton:
+                text: "Ver gráficos"
+                on_release: app.root.current = "graphics"
+
+            MDRectangleFlatButton:
+                text: "Exportar a Excel"
+                on_release: root.exportar_excel()
+
+            MDRectangleFlatButton:
+                text: "Definir presupuesto"
+                on_release: root.popup_presupuesto()
+
+            MDLabel:
+                id: alerta_lbl
+                text: ""
+                markup: True
+                font_style: "Subtitle2"
+                halign: "center"
+                theme_text_color: "Error"
+
+            MDRectangleFlatButton:
+                text: "Cambiar Tema"
+                on_release: app.toggle_theme()
+
+            MDRectangleFlatButton:
+                text: "Cerrar sesión"
+                on_release: app.root.current = "login"
