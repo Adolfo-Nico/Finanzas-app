@@ -5,11 +5,15 @@ from Utilidades import database as db
 from openpyxl.styles import Font
 
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDIconButton
+from kivymd.uix.button import MDFlatButton, MDIconButton, MDRaisedButton
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.toast import toast
-from kivymd.uix.list import TwoLineIconListItem, IconLeftWidget, OneLineListItem
+from kivymd.uix.list import (
+    TwoLineIconListItem,
+    IconLeftWidget,
+    OneLineAvatarIconListItem,
+)
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.label import MDLabel
@@ -214,9 +218,12 @@ class HomeScreen(Screen):
             )
         else:
             for id_, monto, categoria, tipo, fecha, nota in self.tx_filtradas:
-                item = OneLineListItem(
-                    text=f"{id_} | {fecha} | {tipo} | {categoria} | {monto:,.0f} | {nota}"
+                item = OneLineAvatarIconListItem(
+                    text=f"{fecha} | {categoria} | ${monto:,.0f} | {nota}"
                 )
+                icon = "arrow-up-bold" if tipo == "ingreso" else "arrow-down-bold"
+                color = (0, 0.7, 0, 1) if tipo == "ingreso" else (0.8, 0, 0, 1)
+                item.add_widget(IconLeftWidget(icon=icon, theme_text_color="Custom", text_color=color))
                 self.ids.transacciones_list.add_widget(item)
 
     def actualizar_presupuestos(self):

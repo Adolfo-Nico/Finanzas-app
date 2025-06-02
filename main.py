@@ -1,6 +1,6 @@
 from kivymd.app import MDApp
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from screens.login_screen import LoginScreen
 from screens.home_screen import HomeScreen
 from screens.add_transaction_screen import AddTransactionScreen
@@ -16,7 +16,7 @@ class MainApp(MDApp):
         Builder.load_file("kv/home_screen.kv")
         Builder.load_file("kv/add_transaction_screen.kv")
         Builder.load_file("kv/graphics_screen.kv")
-        sm = ScreenManager()
+        sm = ScreenManager(transition=SlideTransition(duration=0.25))
         sm.add_widget(LoginScreen(name="login"))
         sm.add_widget(HomeScreen(name="home"))
         sm.add_widget(AddTransactionScreen(name="add_tx"))
@@ -26,6 +26,8 @@ class MainApp(MDApp):
     def toggle_theme(self):
         self.theme_cls.theme_style = "Dark" if self.theme_cls.theme_style == "Light" else "Light"
 
+    def set_primary_palette(self, palette):
+        self.theme_cls.primary_palette = palette  # Ejemplo: "Blue", "Green", "Red"
+
 if __name__ == "__main__":
-    db.inicializar_db()
     MainApp().run()
