@@ -10,6 +10,9 @@ from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.toast import toast
 from kivymd.uix.list import TwoLineIconListItem, IconLeftWidget, OneLineListItem
+from kivymd.uix.spinner import MDSpinner
+from kivymd.uix.snackbar import Snackbar
+from kivymd.uix.label import MDLabel
 
 class HomeScreen(Screen):
     tx_rows = ListProperty([])
@@ -63,22 +66,25 @@ class HomeScreen(Screen):
         ingresos = sum(m for _, m, _, t, _, _ in self.tx_filtradas if t == "ingreso")
         egresos = sum(m for _, m, _, t, _, _ in self.tx_filtradas if t == "egreso")
         balance = ingresos - egresos
-        self.ids.balance_lbl.text = f"Balance mensual: ${balance:,.0f}"
+        self.ids.balance_lbl.text = f"${balance:,.0f}"
 
     def exportar_excel(self):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Transacciones"
-        ws.append(["ID", "Monto", "Categoria", "Tipo", "Fecha", "Nota"])
-        for id_, monto, categoria, tipo, fecha, nota in self.tx_filtradas:
-            ws.append([id_, monto, categoria, tipo, fecha, nota])
-        for cell in ws["1:1"]:
-            cell.font = Font(bold=True)
+        spinner = MDSpinner(size_hint=(None, None), size=(46, 46), pos_hint={'center_x': .5, 'center_y': .5})
+        self.add_widget(spinner)
         try:
+            wb = openpyxl.Workbook()
+            ws = wb.active
+            ws.title = "Transacciones"
+            ws.append(["ID", "Monto", "Categoria", "Tipo", "Fecha", "Nota"])
+            for id_, monto, categoria, tipo, fecha, nota in self.tx_filtradas:
+                ws.append([id_, monto, categoria, tipo, fecha, nota])
+            for cell in ws["1:1"]:
+                cell.font = Font(bold=True)
             wb.save("transacciones.xlsx")
             toast("Exportado como transacciones.xlsx")
         except Exception as e:
             toast(f"Error al guardar: {e}")
+        self.remove_widget(spinner)
 
     def popup_presupuesto(self):
         self.cat_input = MDTextField(
@@ -125,6 +131,9 @@ class HomeScreen(Screen):
     def guardar_presupuesto(self):
         cat = self.cat_input.text.strip()
         mes = self.mes_input.text.strip()
+        if not cat or not mes or not self.monto_input.text.strip():
+            Snackbar(text="Completa todos los campos.").open()
+            return
         try:
             monto = int(self.monto_input.text)
             db.set_presupuesto(self.user_id, cat, mes, monto)
@@ -134,7 +143,7 @@ class HomeScreen(Screen):
             self.check_alertas()
             self.actualizar_presupuestos()
         except Exception:
-            toast("Monto inválido")
+            Snackbar(text="Monto inválido.").open()
 
     def editar_presupuesto(self, categoria, mes, monto_actual):
         self.cat_input = MDTextField(
@@ -194,23 +203,43 @@ class HomeScreen(Screen):
 
     def actualizar_lista(self):
         self.ids.transacciones_list.clear_widgets()
-        for id_, monto, categoria, tipo, fecha, nota in self.tx_filtradas:
-            item = OneLineListItem(
-                text=f"{id_} | {fecha} | {tipo} | {categoria} | {monto:,.0f} | {nota}"
+        if not self.tx_filtradas:
+            self.ids.transacciones_list.add_widget(
+                MDLabel(
+                    text="No hay transacciones",
+                    halign="center",
+                    theme_text_color="Hint",
+                    font_style="Subtitle1"
+                )
             )
-            self.ids.transacciones_list.add_widget(item)
+        else:
+            for id_, monto, categoria, tipo, fecha, nota in self.tx_filtradas:
+                item = OneLineListItem(
+                    text=f"{id_} | {fecha} | {tipo} | {categoria} | {monto:,.0f} | {nota}"
+                )
+                self.ids.transacciones_list.add_widget(item)
 
     def actualizar_presupuestos(self):
         self.ids.presupuestos_list.clear_widgets()
-        for (cat, mes), monto in self.presupuestos.items():
-            item = TwoLineIconListItem(
-                text=f"{cat} ({mes})",
-                secondary_text=f"Presupuesto: ${monto:,.0f}"
+        if not self.presupuestos:
+            self.ids.presupuestos_list.add_widget(
+                MDLabel(
+                    text="No hay presupuestos activos",
+                    halign="center",
+                    theme_text_color="Hint",
+                    font_style="Subtitle1"
+                )
             )
-            item.add_widget(IconLeftWidget(icon="wallet"))
-            edit_btn = MDIconButton(
-                icon="pencil",
-                on_release=lambda x, c=cat, m=mes, mo=monto: self.editar_presupuesto(c, m, mo)
-            )
-            item.right_widget = edit_btn
-            self.ids.presupuestos_list.add_widget(item)
+        else:
+            for (cat, mes), monto in self.presupuestos.items():
+                item = TwoLineIconListItem(
+                    text=f"{cat} ({mes})",
+                    secondary_text=f"Presupuesto: ${monto:,.0f}"
+                )
+                item.add_widget(IconLeftWidget(icon="wallet"))
+                edit_btn = MDIconButton(
+                    icon="pencil",
+                    on_release=lambda x, c=cat, m=mes, mo=monto: self.editar_presupuesto(c, m, mo)
+                )
+                item.right_widget = edit_btn
+                self.ids.presupuestos_list.add_widget(item)
