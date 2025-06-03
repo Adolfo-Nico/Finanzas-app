@@ -142,75 +142,6 @@
                     radius: [10, 10, 10, 10]
                     md_bg_color: (0.18, 0.15, 0.13, 1) if app.theme_cls.theme_style == "Dark" else (1, 0.98, 0.95, 1)
 
-                    # Primera fila de botones
-                    MDBoxLayout:
-                        orientation: "horizontal"
-                        spacing: "8dp"
-                        size_hint_y: None
-                        height: "48dp"
-
-                        MDRaisedButton:
-                            text: "+ Nueva transacción"
-                            icon: "plus"
-                            md_bg_color: app.theme_cls.primary_color
-                            text_color: 1,1,1,1
-                            on_release: app.root.current = "add_tx"
-                            size_hint_x: 1
-
-                        MDRaisedButton:
-                            text: "Ver gráficos"
-                            icon: "chart-bar"
-                            md_bg_color: 0.25, 0.32, 0.71, 1
-                            text_color: 1,1,1,1
-                            on_release: app.root.current = "graphics"
-                            size_hint_x: 1
-
-                    # Segunda fila de botones
-                    MDBoxLayout:
-                        orientation: "horizontal"
-                        spacing: "8dp"
-                        size_hint_y: None
-                        height: "48dp"
-
-                        MDRaisedButton:
-                            text: "Exportar a Excel"
-                            icon: "file-excel"
-                            md_bg_color: 0.13, 0.55, 0.13, 1
-                            text_color: 1,1,1,1
-                            on_release: root.exportar_excel()
-                            size_hint_x: 1
-
-                        MDRaisedButton:
-                            text: "Definir presupuesto"
-                            icon: "wallet"
-                            md_bg_color: 0.91, 0.49, 0.13, 1
-                            text_color: 1,1,1,1
-                            on_release: root.popup_presupuesto()
-                            size_hint_x: 1
-
-                    # Tercera fila de botones
-                    MDBoxLayout:
-                        orientation: "horizontal"
-                        spacing: "8dp"
-                        size_hint_y: None
-                        height: "48dp"
-
-                        MDRaisedButton:
-                            text: "Cambiar Tema"
-                            icon: "theme-light-dark"
-                            md_bg_color: 0.5, 0.5, 0.5, 1
-                            text_color: 1,1,1,1
-                            on_release: app.toggle_theme()
-                            size_hint_x: 1
-
-                        MDRaisedButton:
-                            text: "Cerrar sesión"
-                            icon: "logout"
-                            md_bg_color: 0.8, 0.2, 0.2, 1
-                            text_color: 1,1,1,1
-                            on_release: app.root.current = "login"
-                            size_hint_x: 1
-
                     MDLabel:
                         id: alerta_lbl
                         text: ""
@@ -220,7 +151,7 @@
                         theme_text_color: "Error"
 
         MDFloatingActionButton:
+            id: fab_menu
             icon: "plus"
-            md_bg_color: app.theme_cls.primary_color
-            pos_hint: {"right": 0.98, "y": 0.02}
-            on_release: app.root.current = "add_tx"
+            pos_hint: {"right": 1, "y": 0}
+            on_release: root.open_menu()

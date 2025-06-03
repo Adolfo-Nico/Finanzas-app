@@ -5,7 +5,7 @@ from Utilidades import database as db
 from openpyxl.styles import Font
 
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDIconButton, MDRaisedButton
+from kivymd.uix.button import MDFlatButton, MDIconButton
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.toast import toast
@@ -17,12 +17,15 @@ from kivymd.uix.list import (
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.snackbar import Snackbar
 from kivymd.uix.label import MDLabel
+from kivymd.uix.menu import MDDropdownMenu
+from kivy.app import App
 
 class HomeScreen(Screen):
     tx_rows = ListProperty([])
     tx_filtradas = ListProperty([])
     user_id = NumericProperty(0)
     presupuestos = {}  # { (categoria, mes): monto }
+    menu = None
 
     def on_pre_enter(self):
         self.presupuestos = db.get_presupuestos(self.user_id)
@@ -30,7 +33,46 @@ class HomeScreen(Screen):
         self.check_alertas()
         self.actualizar_presupuestos()
         self.actualizar_filtros()
+        self.setup_menu()
 
+    def setup_menu(self):
+        if self.menu:
+            return
+        menu_items = [
+            {"text": "+ Nueva transacción", "on_release": lambda x=None: self.menu_action("add_tx")},
+            {"text": "Ver gráficos", "on_release": lambda x=None: self.menu_action("graphics")},
+            {"text": "Exportar a Excel", "on_release": lambda x=None: self.menu_action("exportar")},
+            {"text": "Definir presupuesto", "on_release": lambda x=None: self.menu_action("presupuesto")},
+            {"text": "Cambiar Tema", "on_release": lambda x=None: self.menu_action("tema")},
+            {"text": "Cerrar sesión", "on_release": lambda x=None: self.menu_action("logout")},
+        ]
+        self.menu = MDDropdownMenu(
+            caller=self.ids.fab_menu,
+            items=menu_items,
+            width_mult=4,
+        )
+
+    def open_menu(self):
+        self.menu.caller = self.ids.fab_menu
+        self.menu.open()
+
+    def menu_action(self, action):
+        self.menu.dismiss()
+        app = App.get_running_app()
+        if action == "add_tx":
+            self.manager.current = "add_tx"
+        elif action == "graphics":
+            self.manager.current = "graphics"
+        elif action == "exportar":
+            self.exportar_excel()
+        elif action == "presupuesto":
+            self.popup_presupuesto()
+        elif action == "tema":
+            app.toggle_theme()
+        elif action == "logout":
+            self.manager.current = "login"
+
+    # --- El resto de tus métodos originales ---
     def refresh_list(self):
         if self.user_id:
             self.tx_rows = db.list_tx(self.user_id)
