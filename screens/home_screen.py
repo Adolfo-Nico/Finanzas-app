@@ -10,7 +10,6 @@ from kivymd.uix.textfield import MDTextField
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.toast import toast
 from kivymd.uix.list import (
-    TwoLineIconListItem,
     IconLeftWidget,
     OneLineAvatarIconListItem,
 )
@@ -72,7 +71,6 @@ class HomeScreen(Screen):
         elif action == "logout":
             self.manager.current = "login"
 
-    # --- El resto de tus métodos originales ---
     def refresh_list(self):
         if self.user_id:
             self.tx_rows = db.list_tx(self.user_id)
@@ -225,6 +223,11 @@ class HomeScreen(Screen):
             content_cls=box,
             buttons=[
                 MDFlatButton(
+                    text="ELIMINAR",
+                    theme_text_color="Error",
+                    on_release=lambda x: self.confirmar_eliminar_presupuesto(categoria, mes)
+                ),
+                MDFlatButton(
                     text="CANCELAR",
                     on_release=lambda x: self.dialog_presupuesto.dismiss()
                 ),
@@ -235,6 +238,36 @@ class HomeScreen(Screen):
             ],
         )
         self.dialog_presupuesto.open()
+
+    def confirmar_eliminar_presupuesto(self, categoria, mes):
+        try:
+            self.dialog_presupuesto.dismiss()
+        except Exception:
+            pass
+        self.dialog_confirmar = MDDialog(
+            title="Eliminar presupuesto",
+            text=f"¿Seguro que deseas eliminar el presupuesto de '{categoria}' para {mes}?",
+            buttons=[
+                MDFlatButton(
+                    text="CANCELAR",
+                    on_release=lambda x: self.dialog_confirmar.dismiss()
+                ),
+                MDFlatButton(
+                    text="ELIMINAR",
+                    theme_text_color="Error",
+                    on_release=lambda x: self.eliminar_presupuesto(categoria, mes)
+                ),
+            ],
+        )
+        self.dialog_confirmar.open()
+
+    def eliminar_presupuesto(self, categoria, mes):
+        db.eliminar_presupuesto(self.user_id, categoria, mes)
+        self.presupuestos = db.get_presupuestos(self.user_id)
+        self.actualizar_presupuestos()
+        self.check_alertas()
+        self.dialog_confirmar.dismiss()
+        toast("Presupuesto eliminado")
 
     def check_alertas(self):
         alertas = []
@@ -281,14 +314,22 @@ class HomeScreen(Screen):
             )
         else:
             for (cat, mes), monto in self.presupuestos.items():
-                item = TwoLineIconListItem(
-                    text=f"{cat} ({mes})",
-                    secondary_text=f"Presupuesto: ${monto:,.0f}"
-                )
-                item.add_widget(IconLeftWidget(icon="wallet"))
+                box = MDBoxLayout(orientation="horizontal", size_hint_y=None, height="56dp", padding=(8, 0, 8, 0), spacing=8)
+                icon = IconLeftWidget(icon="wallet")
+                box.add_widget(icon)
+                label_box = MDBoxLayout(orientation="vertical", size_hint_x=0.7)
+                label_box.add_widget(MDLabel(text=f"{cat} ({mes})", font_style="Subtitle1", halign="left"))
+                label_box.add_widget(MDLabel(text=f"Presupuesto: ${monto:,.0f}", font_style="Caption", halign="left"))
+                box.add_widget(label_box)
                 edit_btn = MDIconButton(
                     icon="pencil",
                     on_release=lambda x, c=cat, m=mes, mo=monto: self.editar_presupuesto(c, m, mo)
                 )
-                item.right_widget = edit_btn
-                self.ids.presupuestos_list.add_widget(item)
+                delete_btn = MDIconButton(
+                    icon="delete",
+                    theme_text_color="Error",
+                    on_release=lambda x, c=cat, m=mes: self.confirmar_eliminar_presupuesto(c, m)
+                )
+                box.add_widget(edit_btn)
+                box.add_widget(delete_btn)
+                self.ids.presupuestos_list.add_widget(box)

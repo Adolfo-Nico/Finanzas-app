@@ -103,6 +103,12 @@ def get_presupuestos(user_id):
         res = cur.fetchall()
         return {(cat, mes): monto for cat, mes, monto in res}
 
+def eliminar_presupuesto(user_id, categoria, mes):
+    with _get_conn() as conn:
+        conn.execute("""
+            DELETE FROM presupuestos WHERE user_id=? AND categoria=? AND mes=?
+        """, (user_id, categoria, mes))
+
 # --- Inicialización general ---
 def inicializar_db():
     crear_tabla_usuarios()
