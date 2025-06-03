@@ -74,7 +74,7 @@ FINDTECH/
 
 ## Capturas de pantalla
 
-> *(Agrega aquí imágenes de la interfaz si lo deseas)*
+> 
 
 ---
 
