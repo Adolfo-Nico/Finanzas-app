@@ -21,7 +21,7 @@ FINDTECH es una aplicación de escritorio desarrollada en Python con KivyMD para
 
 1. **Clona este repositorio:**
    ```bash
-   git clone https://github.com/tu_usuario/FINDTECH.git
+   git clone https://github.com/Adolfo-Nico/FINDTECH.git
    cd FINDTECH
    ```
 
